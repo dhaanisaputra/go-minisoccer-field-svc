@@ -33,6 +33,16 @@ type AppConfig struct {
 	GCSClientX509CertURL       string          `json:"gcsClientX509CertURL"`
 	GCSUniverseDomain          string          `json:"gcsUniverseDomain"`
 	BucketName                 string          `json:"bucketName"`
+	MinIO                      MinIOConfig     `json:"minio"`
+}
+
+type MinIOConfig struct {
+	Endpoint   string `json:"endpoint"`
+	PublicURL  string `json:"publicURL"`
+	AccessKey  string `json:"accessKey"`
+	SecretKey  string `json:"secretKey"`
+	UseSSL     bool   `json:"useSSL"`
+	BucketName string `json:"bucketName"`
 }
 
 type InternalService struct {
