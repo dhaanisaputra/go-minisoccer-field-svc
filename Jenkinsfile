@@ -135,6 +135,8 @@ pipeline {
             sed -i "s/^CONSUL_HTTP_URL=.*/CONSUL_HTTP_URL=${CONSUL_HTTP_URL}/" "${targetDir}/.env"
             sed -i "s/^CONSUL_HTTP_KEY=.*/CONSUL_HTTP_KEY=backend\\/field-service/" "${targetDir}/.env"
             sed -i "s/^CONSUL_HTTP_TOKEN=.*/CONSUL_HTTP_TOKEN=${CONSUL_HTTP_TOKEN}/" "${targetDir}/.env"
+            [ -f config.docker.json ] || cp config.docker.example.json config.docker.json
+            sed -i "s|http://localhost:9000|http://${HOST}:9000|" config.docker.json
             sudo docker compose up -d --build --force-recreate
           '
           """
