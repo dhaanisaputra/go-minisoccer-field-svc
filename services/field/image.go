@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"errors"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -11,12 +12,26 @@ import (
 	_ "golang.org/x/image/webp"
 )
 
-// batas sisi terpanjang; di atas ini gambar di-resize proporsional
+// batas sisi terpanjang sebelum resize (lebih dari cukup buat galeri web)
 const maxImageSide = 1600
+
+// batas deklarasi dimensi saat decode — tolak sebelum alokasi memori besar
+// (foto 10000px ≈ 50MP masih lolos; bom dimensi gigapiksel tidak)
+const maxDecodeSide = 10000
+
+var ErrImageTooLarge = errors.New("gambar terlalu besar, maksimal 10000px per sisi")
 
 // convertToWebP decode gambar (jpeg/png/webp), resize kalau melebihi
 // maxImageSide, lalu encode ulang sebagai webp lossless.
 func convertToWebP(data []byte) ([]byte, error) {
+	cfg, _, err := image.DecodeConfig(bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+	if cfg.Width > maxDecodeSide || cfg.Height > maxDecodeSide {
+		return nil, ErrImageTooLarge
+	}
+
 	img, _, err := image.Decode(bytes.NewReader(data))
 	if err != nil {
 		return nil, err

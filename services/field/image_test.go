@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"errors"
 	"image"
 	"image/color"
 	"image/jpeg"
@@ -9,6 +10,29 @@ import (
 
 	_ "golang.org/x/image/webp"
 )
+
+func TestConvertToWebPRejectsHugeDimensions(t *testing.T) {
+	// header JPEG minimal yang mendeklarasikan 10000x10000 (tanpa data scan)
+	// header JPEG minimal: SOI + SOF0 (deklarasi dimensi) + SOS + EOI —
+	// cukup buat DecodeConfig, tanpa data scan
+	data := []byte{0xFF, 0xD8, 0xFF, 0xC0, 0x00, 0x11, 0x08,
+		0x27, 0x11, // height 10001 (lewat batas 10000)
+		0x27, 0x11, // width 10001
+		0x03,
+		0x01, 0x11, 0x00,
+		0x02, 0x11, 0x00,
+		0x03, 0x11, 0x00,
+		0xFF, 0xDA, 0x00, 0x0C, 0x03, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x00, 0x3F, 0x00,
+		0xFF, 0xD9}
+
+	_, err := convertToWebP(data)
+	if err == nil {
+		t.Fatal("expected error untuk gambar 10001x10001")
+	}
+	if !errors.Is(err, ErrImageTooLarge) {
+		t.Fatalf("err = %v, want ErrImageTooLarge", err)
+	}
+}
 
 func TestConvertToWebP(t *testing.T) {
 	// JPEG sintetis 2000x1500 — melampaui batas resize 1600px

@@ -4,6 +4,7 @@ services:
     container_name: field-service
     image: dansss/field-service
     build: .
+    restart: unless-stopped # antipanic kalau MinIO/DB belum siap pas startup
     ports:
       - "8003:8003"
     env_file:
