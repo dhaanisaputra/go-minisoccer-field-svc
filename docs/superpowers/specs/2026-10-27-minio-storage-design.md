@@ -17,6 +17,9 @@ GCS (berbayar) ditinggalkan.
   buat browser).
 - Bucket dibuat + di-set public (policy read-only) otomatis pas app start.
 - Service/controller logic tidak berubah — cuma rename import/type.
+- **Gambar dikonversi sebelum upload**: di-resize (sisi terpanjang max 1600px)
+  lalu di-encode ke **webp** — sesuai best practice pipeline upload
+  (validasi → resize → webp → simpan), file lebih kecil dari JPEG asli.
 
 ## Non-goals / anti-goals
 
@@ -24,8 +27,12 @@ GCS (berbayar) ditinggalkan.
 - Tidak ada saklar `storage.type` GCS/MinIO (opsi 3 ditolak — YAGNI; balik ke GCS
   = git revert kapan aja).
 - Tidak pakai presigned URL — public bucket sudah dipilih.
-- Pola penamaan file di `services/field` (double ekstensi `xxx.png-.png`) tidak
-  disentuh — di luar scope.
+- **Tidak pakai lossy webp** (`chai2010/webp`, cgo) — mesin dev ga punya gcc dan
+  Dockerfile sudah `CGO_ENABLED=0`. Kalau nanti perlu lebih hemat lagi: swap
+  encoder aja, satu fungsi.
+- **EXIF orientation tidak diproses** — foto portrait dari HP yang bergantung
+  putaran EXIF bisa tampil miring (foto lapangan umumnya landscape, risiko
+  kecil). Upgrade-nya: parse EXIF orientation + rotate sebelum encode.
 - Frontend/URL lama: n/a, belum ada data.
 
 ## Constraints
@@ -47,6 +54,12 @@ GCS (berbayar) ditinggalkan.
 SDK: **`github.com/minio/minio-go/v7`** (client resmi; endpoint custom +
 MakeBucket + SetBucketPolicy simpel). Call saya.
 
+Deps konversi gambar (semua pure Go, nol cgo):
+- `github.com/HugoSmits86/nativewebp` v1.3.0 — encoder webp (MIT, lossless VP8L;
+  ini satu-satunya encoder webp pure Go yang mateng).
+- `golang.org/x/image/draw` — resize (CatmullRom, kualitas bagus).
+- `golang.org/x/image/webp` + stdlib `image/jpeg`, `image/png` — decode input.
+
 ## How (keputusan)
 
 - Paket baru `common/storage`:
@@ -60,6 +73,19 @@ MakeBucket + SetBucketPolicy simpel). Call saya.
     return `"{publicURL}/{bucket}/{filename}"`.
 - Hapus `common/gcs/gcs.go` + field `GCS*` di `config.AppConfig` + key `gcs*` di
   kedua file example (mati semua; kalau nanti balik GCS, git revert).
+- **Konversi gambar** — file baru `services/field/image.go`, helper unexported
+  `convertToWebP(data []byte) ([]byte, error)`:
+  1. `image.Decode` (register via blank import: jpeg, png, webp).
+  2. Kalau sisi terpanjang > 1600px → resize proporsional (`draw.CatmullRom`).
+  3. `nativewebp.Encode` → keluar `.webp`.
+  4. Gagal decode/encode → return error, request balas error (konsisten sama
+     error handling upload sekarang).
+  Dipanggil dari `processAndUploadImages` sebelum `UploadFile`.
+  Shortcut: foto JPEG kecil (<1600px) bisa sedikit lebih besar dari aslinya
+  karena lossless — kalau perlu lebih hemat, upgrade ke lossy (cgo).
+- **Nama file** ikut berubah (ext harus `.webp`): dari pola lama
+  `images/<ts>-<namaAsli+ext>-<ext>` (double ext) → `images/<ts>-<baseNama>.webp`
+  (`path.Base` + trim ext asli, bersih dari path).
 - Rename di caller (cuma nama): `services/field` (field + param `gcs`→`storage`),
   `services/registry.go`, `cmd/main.go` (`initGCS`→`initStorage`).
 - Config baru (AppConfig `json:"minio"`): `endpoint`, `publicURL`, `accessKey`,
@@ -80,11 +106,15 @@ MakeBucket + SetBucketPolicy simpel). Call saya.
 
 1. `go build ./...` + `go vet ./...` bersih.
 2. `docker compose config` valid.
-3. Test kecil `storage/minio_test.go`: skip kalau minio ga nyala; kalau nyala →
+3. Test `services/field/image_test.go` (murni, tanpa minio): bikin JPEG sintetis
+   2000×1500 → `convertToWebP` → assert output ber-magic webp dan sisi terpanjang
+   ≤ 1600px.
+4. Test kecil `storage/minio_test.go`: skip kalau minio ga nyala; kalau nyala →
    `UploadFile` file dummy, assert URL ke-`GET` balas 200 + isi sesuai.
    (Curl POST end-to-end tetap butuh user-service + JWT — di luar test ini.)
 
 ## What's left to builder
 
 Eksekusi persis keputusan di atas, urutan bebas; semua titik sentuh sudah
-terdaftar (storage pkg, 3 file rename, config ×3, compose, Jenkins, test).
+terdaftar (storage pkg, image converter, 3 file rename, config ×3, compose,
+Jenkins, 2 test, tambahan deps di go.mod).
