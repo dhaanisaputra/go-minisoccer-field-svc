@@ -22,18 +22,6 @@
         "signatureKey": ""
     }
   },
-  "gcsType": "",
-  "gcsProjectID": "",
-  "gcsPrivateKeyID": "",
-  "gcsPrivateKey": "",
-  "gcsClientEmail": "",
-  "gcsClientID": "",
-  "gcsAuthURI": "",
-  "gcsTokenURI": "",
-  "gcsAuthProviderX509CertURL": "",
-  "gcsClientX509CertURL": "",
-  "gcsUniverseDomain": "",
-  "bucketName": "",
   "minio": {
     "endpoint": "localhost:9000",
     "publicURL": "http://localhost:9000",

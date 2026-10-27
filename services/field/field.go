@@ -3,7 +3,7 @@ package services
 import (
 	"bytes"
 	"context"
-	"field-service/common/gcs"
+	"field-service/common/storage"
 	"field-service/common/util"
 	errConstant "field-service/constants/error"
 	"field-service/domain/dto"
@@ -18,7 +18,7 @@ import (
 
 type FieldService struct {
 	repository repositories.IRepositoryRegistry
-	gcs        gcs.IGCSClient
+	storage    storage.IStorageClient
 }
 
 type IFieldService interface {
@@ -30,8 +30,8 @@ type IFieldService interface {
 	Delete(context.Context, string) error
 }
 
-func NewFieldService(repository repositories.IRepositoryRegistry, gcs gcs.IGCSClient) IFieldService {
-	return &FieldService{repository: repository, gcs: gcs}
+func NewFieldService(repository repositories.IRepositoryRegistry, store storage.IStorageClient) IFieldService {
+	return &FieldService{repository: repository, storage: store}
 }
 
 func (s *FieldService) GetAllWithPagination(ctx context.Context,
@@ -129,7 +129,7 @@ func (s *FieldService) processAndUploadImages(ctx context.Context, image multipa
 	}
 
 	filename := fmt.Sprintf("images/%s-%s-%s", time.Now().Format("20060102150405"), image.Filename, path.Ext(image.Filename))
-	url, err := s.gcs.UploadFile(ctx, filename, buffer.Bytes())
+	url, err := s.storage.UploadFile(ctx, filename, buffer.Bytes())
 	if err != nil {
 		return "", err
 	}

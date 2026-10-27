@@ -1,7 +1,7 @@
 package services
 
 import (
-	"field-service/common/gcs"
+	"field-service/common/storage"
 	"field-service/repositories"
 	services "field-service/services/field"
 	fieldschedule "field-service/services/fieldschedule"
@@ -10,7 +10,7 @@ import (
 
 type Registry struct {
 	repository repositories.IRepositoryRegistry
-	gcs        gcs.IGCSClient
+	storage    storage.IStorageClient
 }
 
 type IServiceRegistry interface {
@@ -19,12 +19,12 @@ type IServiceRegistry interface {
 	GetTime() time.ITimeService
 }
 
-func NewServiceRegistry(repository repositories.IRepositoryRegistry, gcs gcs.IGCSClient) IServiceRegistry {
-	return &Registry{repository: repository, gcs: gcs}
+func NewServiceRegistry(repository repositories.IRepositoryRegistry, store storage.IStorageClient) IServiceRegistry {
+	return &Registry{repository: repository, storage: store}
 }
 
 func (r *Registry) GetField() services.IFieldService {
-	return services.NewFieldService(r.repository, r.gcs)
+	return services.NewFieldService(r.repository, r.storage)
 }
 
 func (r *Registry) GetFieldSchedule() fieldschedule.IFieldScheduleService {

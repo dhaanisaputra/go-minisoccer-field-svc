@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	"encoding/base64"
 	"field-service/clients"
-	"field-service/common/gcs"
+	"field-service/common/storage"
 	"field-service/common/response"
 	"field-service/config"
 	"field-service/constants"
@@ -54,10 +53,10 @@ var command = &cobra.Command{
 		}
 
 		// set seeder
-		gcs := initGCS()
+		store := initStorage()
 		client := clients.NewClientRegistry()
 		repository := repositories.NewRepositoryRegistry(db)
-		service := services.NewServiceRegistry(repository, gcs)
+		service := services.NewServiceRegistry(repository, store)
 		controller := controllers.NewControllerRegistry(service)
 
 		router := gin.Default()
@@ -109,27 +108,10 @@ func Run() {
 	}
 }
 
-func initGCS() gcs.IGCSClient {
-	decode, err := base64.StdEncoding.DecodeString(config.Config.GCSPrivateKey)
+func initStorage() storage.IStorageClient {
+	client, err := storage.NewMinIOClient(config.Config.MinIO)
 	if err != nil {
 		panic(err)
 	}
-
-	stringPrivateKey := string(decode)
-	gcsServiceAccount := gcs.ServiceAccountKeyJSON{
-		Type:                    config.Config.GCSType,
-		ProjectID:               config.Config.GCSProjectID,
-		PrivateKeyID:            config.Config.GCSPrivateKeyID,
-		PrivateKey:              stringPrivateKey,
-		ClientEmail:             config.Config.GCSClientEmail,
-		ClientID:                config.Config.GCSClientID,
-		AuthURI:                 config.Config.GCSAuthURI,
-		TokenURI:                config.Config.GCSTokenURI,
-		AuthProviderX509CertURL: config.Config.GCSAuthProviderX509CertURL,
-		ClientX509CertURL:       config.Config.GCSClientX509CertURL,
-		UniverseDomain:          config.Config.GCSUniverseDomain,
-	}
-
-	gcsClient := gcs.NewGCSClient(gcsServiceAccount, config.Config.BucketName)
-	return gcsClient
+	return client
 }

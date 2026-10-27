@@ -21,18 +21,6 @@ type AppConfig struct {
 	JwtSecretKey               string          `json:"jwtSecretKey"`
 	JwtExpirationTime          int             `json:"jwtExpirationTime"`
 	InternalService            InternalService `json:"internalService"`
-	GCSType                    string          `json:"gcsType"`
-	GCSProjectID               string          `json:"gcsProjectID"`
-	GCSPrivateKeyID            string          `json:"gcsPrivateKeyID"`
-	GCSPrivateKey              string          `json:"gcsPrivateKey"`
-	GCSClientEmail             string          `json:"gcsClientEmail"`
-	GCSClientID                string          `json:"gcsClientID"`
-	GCSAuthURI                 string          `json:"gcsAuthURI"`
-	GCSTokenURI                string          `json:"gcsTokenURI"`
-	GCSAuthProviderX509CertURL string          `json:"gcsAuthProviderX509CertURL"`
-	GCSClientX509CertURL       string          `json:"gcsClientX509CertURL"`
-	GCSUniverseDomain          string          `json:"gcsUniverseDomain"`
-	BucketName                 string          `json:"bucketName"`
 	MinIO                      MinIOConfig     `json:"minio"`
 }
 
