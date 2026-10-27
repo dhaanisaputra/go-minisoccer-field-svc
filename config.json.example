@@ -1,6 +1,6 @@
 {
-  "port": 8001,
-  "appName": "user-service",
+  "port": 8003,
+  "appName": "field-service",
   "appEnv": "local",
   "signatureKey": "",
   "database": {
@@ -9,7 +9,7 @@
     "name": "",
     "username": "",
     "password": "",
-    "maxOpenConnection": 10,
+    "maxOpenConnections": 10,
     "maxLifetimeConnection": 10,
     "maxIdleConnection": 10,
     "maxIdleTime": 10

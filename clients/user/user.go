@@ -15,14 +15,14 @@ type UserClient struct {
 }
 
 type IUserClient interface {
-	GetUserByToken(ctx context.Context) (*Userdata, error)
+	GetUserByToken(ctx context.Context) (*UserData, error)
 }
 
 func NewUserClient(client config.IClientConfig) IUserClient {
 	return &UserClient{client: client}
 }
 
-func (u *UserClient) GetUserByToken(ctx context.Context) (*Userdata, error) {
+func (u *UserClient) GetUserByToken(ctx context.Context) (*UserData, error) {
 	unixTime := time.Now().Unix()
 	generateAPIKey := fmt.Sprintf("%s:%s:%d",
 		config2.Config.AppName,
@@ -35,7 +35,7 @@ func (u *UserClient) GetUserByToken(ctx context.Context) (*Userdata, error) {
 	var response UserResponse
 	request := u.client.Client().Clone().
 		Set(constants.Authorization, bearerToken).
-		Set(constants.APIKey, apiKey).
+		Set(constants.XApiKey, apiKey).
 		Set(constants.XServiceName, config2.Config.AppName).
 		Set(constants.XRequestAt, fmt.Sprintf("%d", unixTime)).
 		Get(fmt.Sprintf("%s/api/v1/auth/user", u.client.BaseURL()))

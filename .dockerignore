@@ -1,0 +1,11 @@
+.git
+.env
+config.json
+config.docker.json
+bin/
+.idea/
+docker-compose.yml
+Dockerfile
+Jenkinsfile
+Makefile
+README.md

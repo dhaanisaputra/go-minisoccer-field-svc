@@ -1,0 +1,37 @@
+{
+  "port": 8003,
+  "appName": "field-service",
+  "appEnv": "docker",
+  "signatureKey": "",
+  "database": {
+    "host": "postgres",
+    "port": 5432,
+    "name": "go-field-service",
+    "username": "postgres",
+    "password": "admin",
+    "maxOpenConnections": 10,
+    "maxLifetimeConnection": 10,
+    "maxIdleConnection": 10,
+    "maxIdleTime": 10
+  },
+  "rateLimiterMaxRequest": 1000,
+  "rateLimiterTimeSecond": 60,
+  "internalService": {
+    "user": {
+      "host": "http://host.docker.internal:8000",
+      "signatureKey": ""
+    }
+  },
+  "gcsType": "",
+  "gcsProjectID": "",
+  "gcsPrivateKeyID": "",
+  "gcsPrivateKey": "",
+  "gcsClientEmail": "",
+  "gcsClientID": "",
+  "gcsAuthURI": "",
+  "gcsTokenURI": "",
+  "gcsAuthProviderX509CertURL": "",
+  "gcsClientX509CertURL": "",
+  "gcsUniverseDomain": "",
+  "bucketName": ""
+}

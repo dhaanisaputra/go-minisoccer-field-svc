@@ -105,7 +105,11 @@ func (g *GCSClient) UploadFile(ctx context.Context, filename string, data []byte
 
 	_, err = obj.Update(ctx, storage.ObjectAttrsToUpdate{
 		ContentType: contentType})
+	if err != nil {
+		logrus.Errorf("failed to update object attrs: %v", err)
+		return "", err
+	}
 
-	url := fmt.Sprintf("https:minio", g.BucketName, filename)
+	url := fmt.Sprintf("https://storage.googleapis.com/%s/%s", g.BucketName, filename)
 	return url, nil
 }

@@ -24,7 +24,7 @@ func NewClientConfig(opts ...Option) *ClientConfig {
 			Set("Accept", "application/json"),
 	}
 
-	for _, option := range options {
+	for _, option := range opts {
 		option(clientConfig)
 	}
 

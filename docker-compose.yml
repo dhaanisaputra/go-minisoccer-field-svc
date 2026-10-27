@@ -1,9 +1,28 @@
-name: booking-order-app # change this to your app name
+name: field-service
 services:
-  user-service: # change this to your service name
-    container_name: user-service # change this to your service name
-    image: sikoding20/user-service # change this to your image name
+  field-service:
+    container_name: field-service
+    image: dansss/field-service
+    build: .
     ports:
-      - "8001:8001" # change this to your port
+      - "8003:8003"
     env_file:
       - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # biar bisa manggil user-service di host
+    volumes:
+      # kalau file belum ada, salin dulu: cp config.docker.example.json config.docker.json
+      - ./config.docker.json:/app/config.json
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: go-field-service
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
