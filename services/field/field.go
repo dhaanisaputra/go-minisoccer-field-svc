@@ -13,6 +13,7 @@ import (
 	"io"
 	"mime/multipart"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -128,8 +129,14 @@ func (s *FieldService) processAndUploadImages(ctx context.Context, image multipa
 		return "", err
 	}
 
-	filename := fmt.Sprintf("images/%s-%s-%s", time.Now().Format("20060102150405"), image.Filename, path.Ext(image.Filename))
-	url, err := s.storage.UploadFile(ctx, filename, buffer.Bytes())
+	webpData, err := convertToWebP(buffer.Bytes())
+	if err != nil {
+		return "", err
+	}
+
+	base := strings.TrimSuffix(path.Base(image.Filename), path.Ext(image.Filename))
+	filename := fmt.Sprintf("images/%d-%s.webp", time.Now().Unix(), base)
+	url, err := s.storage.UploadFile(ctx, filename, webpData)
 	if err != nil {
 		return "", err
 	}
