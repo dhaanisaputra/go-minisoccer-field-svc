@@ -4,6 +4,7 @@ go 1.26.10
 
 require (
 	cloud.google.com/go/storage v1.56.0
+	github.com/HugoSmits86/nativewebp v1.3.0
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gin-gonic/gin v1.12.0
@@ -16,6 +17,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/spf13/viper/remote v1.21.0
+	golang.org/x/image v0.47.0
 	google.golang.org/api v0.307.0
 	gorm.io/driver/postgres v1.6.3
 	gorm.io/gorm v1.31.2
