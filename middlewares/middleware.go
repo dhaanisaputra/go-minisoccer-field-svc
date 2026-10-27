@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"field-service/clients"
@@ -131,6 +132,11 @@ func Authenticated() gin.HandlerFunc {
 			responseUnauthorized(c, err.Error())
 			return
 		}
+
+		// token dari Authorization disimpan ke context buat CheckRole
+		c.Request = c.Request.WithContext(
+			context.WithValue(c.Request.Context(), constants.Token, extractBearerToken(token)),
+		)
 
 		c.Next()
 	}
