@@ -137,7 +137,7 @@ pipeline {
             sed -i "s/^CONSUL_HTTP_TOKEN=.*/CONSUL_HTTP_TOKEN=${CONSUL_HTTP_TOKEN}/" "${targetDir}/.env"
             [ -f config.docker.json ] || cp config.docker.example.json config.docker.json
             grep -q minio config.docker.json || { echo "config.docker.json lama tanpa blok minio - tambahkan manual lalu redeploy"; exit 1; }
-            sed -i "s|http://localhost:9000|http://${HOST}:9000|" config.docker.json
+            sed -i "s|http://localhost:9100|http://${HOST}:9100|" config.docker.json
             sudo docker compose up -d --build --force-recreate
           '
           """

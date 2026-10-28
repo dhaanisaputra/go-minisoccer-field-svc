@@ -13,7 +13,7 @@ import (
 )
 
 func minioReachable() bool {
-	conn, err := net.DialTimeout("tcp", "localhost:9000", time.Second)
+	conn, err := net.DialTimeout("tcp", "localhost:9100", time.Second)
 	if err != nil {
 		return false
 	}
@@ -23,12 +23,12 @@ func minioReachable() bool {
 
 func TestUploadFile(t *testing.T) {
 	if !minioReachable() {
-		t.Skip("minio tidak jalan di localhost:9000")
+		t.Skip("minio tidak jalan di localhost:9100")
 	}
 
 	cfg := config.MinIOConfig{
-		Endpoint:   "localhost:9000",
-		PublicURL:  "http://localhost:9000",
+		Endpoint:   "localhost:9100",
+		PublicURL:  "http://localhost:9100",
 		AccessKey:  "minioadmin",
 		SecretKey:  "minioadmin",
 		UseSSL:     false,
@@ -47,7 +47,7 @@ func TestUploadFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("UploadFile: %v", err)
 	}
-	wantURL := "http://localhost:9000/field-images/" + name
+	wantURL := "http://localhost:9100/field-images/" + name
 	if url != wantURL {
 		t.Fatalf("url = %q, want %q", url, wantURL)
 	}

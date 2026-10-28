@@ -114,7 +114,7 @@ func (r *FieldScheduleRepository) FindByDateAndTimeID(ctx context.Context, date 
 		Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errWrap.WrapError(errFieldSchedule.ErrFieldScheduleNotFound)
+			return nil, nil
 		}
 		return nil, errWrap.WrapError(errConstant.ErrSQLError)
 	}
