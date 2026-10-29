@@ -108,7 +108,7 @@ func (r *FieldScheduleRepository) FindByDateAndTimeID(ctx context.Context, date 
 	var fieldSchedule models.FieldSchedule
 	err := r.db.WithContext(ctx).
 		Where("date = ?", date).
-		Where("tiem_id = ?", timeID).
+		Where("time_id = ?", timeID).
 		Where("field_id = ?", fieldID).
 		First(&fieldSchedule).
 		Error

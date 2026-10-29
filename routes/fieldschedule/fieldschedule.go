@@ -29,7 +29,7 @@ func NewFieldScheduleRoute(controller controllers.IControllerRegistry, group *gi
 
 func (r *FieldScheduleRoute) Run() {
 	group := r.group.Group("/field/schedule")
-	group.GET("", middlewares.AuthenticatedWithoutToken(), r.controller.GetFieldSchedule().GetAllByFieldIDAndDate)
+	group.GET("/lists/:uuid", middlewares.AuthenticatedWithoutToken(), r.controller.GetFieldSchedule().GetAllByFieldIDAndDate)
 	group.PATCH("", middlewares.AuthenticatedWithoutToken(), r.controller.GetFieldSchedule().UpdateStatus)
 	group.Use(middlewares.Authenticated())
 	group.GET("/pagination", middlewares.CheckRole([]string{

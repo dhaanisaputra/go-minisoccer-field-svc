@@ -18,7 +18,7 @@
   "rateLimiterTimeSecond": 60,
   "internalService": {
     "user": {
-        "host": "http://localhost:8000",
+        "host": "http://localhost:8001",
         "signatureKey": ""
     }
   },
