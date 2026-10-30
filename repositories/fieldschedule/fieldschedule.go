@@ -161,7 +161,7 @@ func (r *FieldScheduleRepository) UpdateStatus(ctx context.Context, status const
 }
 
 func (r *FieldScheduleRepository) Delete(ctx context.Context, uuid string) error {
-	err := r.db.WithContext(ctx).Where("uuid = ?", uuid).Delete(&models.FieldSchedule{}, uuid).Error
+	err := r.db.WithContext(ctx).Where("uuid = ?", uuid).Delete(&models.FieldSchedule{}).Error
 	if err != nil {
 		return errWrap.WrapError(errConstant.ErrSQLError)
 	}
